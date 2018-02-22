@@ -43,3 +43,29 @@
 
 
 ;---------- Challenge 2 ---------------
+(def xor-a "1c0111001f010100061a024b53535009181c")
+(def xor-b "686974207468652062756c6c277320657965")
+(def xor-c "746865206b696420646f6e277420706c6179")
+(def ch2-expected-ascii "the kid don't play")
+
+(defn zip [& colls]
+  (partition (count colls) (apply interleave colls)))
+
+(defn xor-strs [s1 s2]
+  "XOR 2 hex strings, and return their ascii value."
+  (let [a1 (map int (hex->ascii s1))
+        a2 (map int (hex->ascii s2))
+        tups (zip a1  a2)]
+    (apply str
+           (map
+             (fn [[x y]] (char (bit-xor x y)))
+             tups))))
+
+(defn xor-strs' [s1 s2]
+  "XOR 2 hex strings and return their hex value."
+  (ascii->hex (xor-strs s1 s2)))
+
+(xor-strs xor-a xor-b)
+(xor-strs' xor-a xor-b)
+;--------------- end -------------
+

@@ -13,3 +13,10 @@
     (is (= (b64->hex expected)
            hexvals))))
 ;--------- end -----------
+
+;----- Challenge 2 ------
+(deftest xor-strs-test
+  (testing "Xor 2 Strings"
+    (is (= (xor-strs' xor-a xor-b)
+           xor-c))))
+;-------- end -------

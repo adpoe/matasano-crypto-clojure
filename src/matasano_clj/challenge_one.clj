@@ -2,12 +2,10 @@
   (:import java.util.Base64))
 
 ;--------- Challenge 1 ---------------
-; example data
 (def hexvals "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d")
 (def expected "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t")
 (def ascii-ex "I'm killing your brain like a poisonous mushroom")
 
-; functions
 (defn hex->ascii [hex]
   "Transform a string of all hex values into a string of all ascii values."
   (apply str
@@ -49,6 +47,7 @@
 (def ch2-expected-ascii "the kid don't play")
 
 (defn zip [& colls]
+  "Mirrors the `zip` function in Haskell."
   (partition (count colls) (apply interleave colls)))
 
 (defn xor-strs [s1 s2]

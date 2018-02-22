@@ -4,6 +4,8 @@ A work in progress. Clojure solutions to the Matasano Crypto Challenge.
 
 https://cryptopals.com/
 
+Done to supplement learning more Clojure with some programming exercises.
+
 ## Usage
 Requires Leiningen.
 https://leiningen.org/

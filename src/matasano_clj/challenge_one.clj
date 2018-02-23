@@ -110,7 +110,7 @@
 
 (defn get-score-map [char-list xored-candidates]
   "Index each possible single-byte cipher character with its score."
- (zipmap char-list
+  (zipmap char-list
         (map score-text
              (map hex->ascii
                   xored-candidates))))
@@ -132,13 +132,14 @@
 (defn decode-single-byte-xor [ciphertext ch]
   "Given a single character and ciphertext, decode the ciphertext as a single byte XOR cipher."
   (hex->ascii (xor-strs' ciphertext
-                       (ascii->hex (match-length ciphertext ch)))))
+                         (ascii->hex (match-length ciphertext ch)))))
 
 (defn get-n-most-likely-decodings [n ciphertext]
   "Return plaintextof the N most likely single-byte XOR decodings
   of a given ciphertext."
   (let [n-most-likely (map first (take n (single-byte-xor ch3-cipher)))]
-    (map (partial decode-single-byte-xor ciphertext) n-most-likely)))
+      (map (partial decode-single-byte-xor ciphertext)
+         n-most-likely)))
 
 (get-n-most-likely-candidates 5 ch3-cipher)
 (get-n-most-likely-decodings 5 ch3-cipher)

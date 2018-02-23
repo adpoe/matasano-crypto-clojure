@@ -139,7 +139,7 @@
   of a given ciphertext."
   (let [n-most-likely (map first (take n (single-byte-xor ch3-cipher)))]
       (map (partial decode-single-byte-xor ciphertext)
-         n-most-likely)))
+            n-most-likely)))
 
 (get-n-most-likely-candidates 5 ch3-cipher)
 (get-n-most-likely-decodings 5 ch3-cipher)

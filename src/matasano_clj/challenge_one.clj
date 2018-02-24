@@ -233,5 +233,53 @@
 ;------- end --------
 
 
+;------ Challenge 6 ------
+(defn get-ch6-text []
+  "Load the text from data source for challenge 6."
+  (s/split-lines (slurp (str (get-cwd) "/data/4.txt"))))
 
+;(get-ch4-text)
+(def keysizes (range 2 41))
 
+;  .... hamming distance ....
+(def hamming-1 "this is a test")
+(def hamming-2 "wokka wokka!!!")
+(def hamming-exp 37)
+
+(def hex->bits
+  "Mapping from the hex chars to a string representation of their binary form."
+  {\0 "0000"
+   \1 "0001"
+   \2 "0010"
+   \3 "0011"
+   \4 "0100"
+   \5 "0101"
+   \6 "0110"
+   \7 "0111"
+   \8 "1000"
+   \9 "1001"
+   \a "1010"
+   \b "1011"
+   \c "1100"
+   \d "1101"
+   \e "1110"
+   \f "1111"})
+
+(defn distance [a b]
+  "Generalized distance fucntion."
+  (->> (map not= a b)
+       (filter true?)
+       count))
+
+(defn str->bits [text]
+  "Transform a hex-encoded string into a bitstring."
+  (apply str
+    (map (partial get hex->bits)
+       (ascii->hex (char-array text)))))
+
+(defn hamming-dist [s1 s2]
+  "Find the hamming distance between 2 ascii encoded strings."
+  (distance (str->bits hamming-1) (str->bits hamming-2)))
+
+(hamming-dist hamming-1 hamming-2)
+; => 37

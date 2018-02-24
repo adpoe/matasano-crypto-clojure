@@ -279,7 +279,7 @@
 
 (defn hamming-dist [s1 s2]
   "Find the hamming distance between 2 ascii encoded strings."
-  (distance (str->bits hamming-1) (str->bits hamming-2)))
+  (distance (str->bits s1) (str->bits s2)))
 
-(hamming-dist hamming-1 hamming-2)
+;(hamming-dist hamming-1 hamming-2)
 ; => 37

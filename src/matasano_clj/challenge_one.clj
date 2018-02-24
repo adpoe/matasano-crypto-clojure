@@ -65,8 +65,8 @@
   "XOR 2 hex strings and return their hex value."
   (ascii->hex (xor-strs s1 s2)))
 
-(xor-strs xor-a xor-b)
-(xor-strs' xor-a xor-b)
+;(xor-strs' xor-a xor-b)
+; => "746865206b696420646f6e277420706c6179"
 ;--------------- end -------------
 
 
@@ -101,7 +101,7 @@
 (defn get-single-byte-ciphers [ciphertext]
   "Get all possible ascii single-byte ciphers of same length as target ciphertext."
   (map (partial match-length ciphertext)
-        ascii-chars))
+       ascii-chars))
 
 (defn get-xored-candidates [ciphertext candidates]
   "XOR all candidate single-byte ciphers with target ciphertext."
@@ -139,7 +139,7 @@
   of a given ciphertext."
   (let [n-most-likely (map first (take n (single-byte-xor ciphertext)))]
       (map (partial decode-single-byte-xor ciphertext)
-            n-most-likely)))
+           n-most-likely)))
 
 (get-n-most-likely-candidates 5 ch3-cipher)
 (get-n-most-likely-decodings 5 ch3-cipher)
@@ -151,13 +151,12 @@
   (zip (get-n-most-likely-candidates n ciphertext)
        (get-n-most-likely-decodings n ciphertext)))
 
-(single-byte-xor' 5 ch3-cipher)
-
-;(([\X 158] "Cooking MC's like a pound of bacon")
-;  ([\R 131] "Ieeacdm*GI-y*fcao*k*zedn*el*hkied")
-;  ([\r 131] "iEEACDM\ngi\rY\nFCAO\nK\nZE_DN\nEL\nHKIED")
-;  ([\^ 123] "Eiimoha&KE!u&jomc&g&vishb&i`&dgeih")
-;  ([\~ 123] "eIIMOHAkeUJOMCGVISHBI@DGEIH"))
+;(single-byte-xor' 5 ch3-cipher)
+;=> (([\X 158] "Cooking MC's like a pound of bacon")
+;   ([\R 131] "Ieeacdm*GI-y*fcao*k*zedn*el*hkied")
+;   ([\r 131] "iEEACDM\ngi\rY\nFCAO\nK\nZE_DN\nEL\nHKIED")
+;   ([\^ 123] "Eiimoha&KE!u&jomc&g&vishb&i`&dgeih")
+;   ([\~ 123] "eIIMOHAkeUJOMCGVISHBI@DGEIH"))
 ;------------ end ----------------
 
 ;--------- Challenge 4 -----------
@@ -186,15 +185,53 @@
     xors))
 
 (defn get-n-most-likely-xors [n text]
-  "Get the N mos likely lines that contain a single-byte XOR encoded string."
+  "Get the N most likely lines that contain a single-byte XOR encoded string."
   (let [xors (get-max-likelihood-xor text)
         sorted-xors (sort-xors xors)]
     (take n sorted-xors)))
 
-(get-n-most-likely-xors 5 (get-ch4-text))
+;(get-n-most-likely-xors 5 (get-ch4-text))
 ; => ((([\5 161] "Now that the party is jumping\n"))
 ;  (([\Q 119] "W¹¨[`IiMED,EeTSAgoaT@ñ[l°Ui"))
 ;  (([\~ 117] " )OMBCr9t9+iM/nOHTEqM4AOHn<N"))
 ;  (([\L 115] "edA®tDPebL«Sw}RS\rEtqt.jNt"))
 ;  (([\Z 114] "tHuvGUEMTViEV\\sLJn\\Y#EieTV")))
 ;----------- end ------------
+
+
+;------- Challenge 5 --------
+(def stanza '("Burning 'em, if you ain't quick and nimble "
+               "I go crazy when I hear a cymbal"))
+
+(def enc-stanza '("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
+                  "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"))
+
+(def stanz (apply str stanza))
+
+(defn get-repeating-key [key text]
+  "Get a string representing the repeating key that is equal length as input text."
+  (apply str (take (count text) (cycle key))))
+
+(get-repeating-key "ICE" (first stanza))
+
+(defn repeating-key-xor [key text]
+  "Perform a repeating key XOR on input key and target text."
+  (let [rep-key (ascii->hex (get-repeating-key key text))
+        hex-text (ascii->hex text)]
+    (xor-strs' rep-key hex-text)))
+
+; another option, if needed
+(defn get-repeating-key-xors [key text-lines]
+  "Map a repeating key XOR over N lines of text."
+  (map (partial repeating-key-xor key)
+       text-lines))
+
+;(repeating-key-xor "ICE" stanz)
+; =>
+;"0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20690a652e2c652a3124333a653e2b
+; 2027630c692b20283165286326302e27282f"
+;------- end --------
+
+
+
+

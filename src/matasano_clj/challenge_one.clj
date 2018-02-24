@@ -81,7 +81,7 @@
 (def letter-scores
   "A mapping from most commonly used letters to a score."
   (zipmap
-    letter-freqs
+    (reverse letter-freqs)
     (range (count letter-freqs))))
 
 (defn score-text [text]
@@ -137,7 +137,7 @@
 (defn get-n-most-likely-decodings [n ciphertext]
   "Return plaintextof the N most likely single-byte XOR decodings
   of a given ciphertext."
-  (let [n-most-likely (map first (take n (single-byte-xor ch3-cipher)))]
+  (let [n-most-likely (map first (take n (single-byte-xor ciphertext)))]
       (map (partial decode-single-byte-xor ciphertext)
             n-most-likely)))
 
@@ -148,14 +148,53 @@
   "Get a mapping of the N most likely ascii chars encoding
   a single byte XOR on the target ciphertext,
   along with the decoding."
-  (zip (get-n-most-likely-candidates n ch3-cipher)
-       (get-n-most-likely-decodings n ch3-cipher)))
+  (zip (get-n-most-likely-candidates n ciphertext)
+       (get-n-most-likely-decodings n ciphertext)))
 
 (single-byte-xor' 5 ch3-cipher)
 
-;'(([\_ 132] "Dhhlni`'JD t'knlb'f'whric'ha'efdhi")
-;   ([\X 118] "Cooking MC's like a pound of bacon")  <= the winner.
-;   ([\D 104] "_sswur{<Q_;o<puwy<}<lsirx<sz<~}sr")
-;   ([\d 104] "SSWUR[qOPUWY]LSIRXSZ^]_SR")
-;   ([\[ 98] "@llhjmd#N@$p#ojhf#b#slvmg#le#ab`lm"))
-;-------------- end ------------------
+;(([\X 158] "Cooking MC's like a pound of bacon")
+;  ([\R 131] "Ieeacdm*GI-y*fcao*k*zedn*el*hkied")
+;  ([\r 131] "iEEACDM\ngi\rY\nFCAO\nK\nZE_DN\nEL\nHKIED")
+;  ([\^ 123] "Eiimoha&KE!u&jomc&g&vishb&i`&dgeih")
+;  ([\~ 123] "eIIMOHAkeUJOMCGVISHBI@DGEIH"))
+;------------ end ----------------
+
+;--------- Challenge 4 -----------
+(defn get-cwd []
+  "Get the current working directory."
+  (.getCanonicalPath (clojure.java.io/file ".")))
+
+(defn get-ch4-text []
+  "Load the text from data source for challenge 4."
+  (s/split-lines (slurp (str (get-cwd) "/data/4.txt"))))
+
+(defn get-max-likelihood-xor [text]
+  "Get the most likely line that is encoded with single-byte XOR,
+  in a collection of strings."
+  (map (partial single-byte-xor' 1)
+      (get-ch4-text)))
+
+(defn index-into-nested-mapping [row]
+  "Index into this nested mapping that I've created, so we can easily sort."
+  (second (first (first row))))
+
+(defn sort-xors [xors]
+  "Sort the resulting XORed strings by likelihood that they are English text."
+  (sort-by
+    index-into-nested-mapping >
+    xors))
+
+(defn get-n-most-likely-xors [n text]
+  "Get the N mos likely lines that contain a single-byte XOR encoded string."
+  (let [xors (get-max-likelihood-xor text)
+        sorted-xors (sort-xors xors)]
+    (take n sorted-xors)))
+
+(get-n-most-likely-xors 5 (get-ch4-text))
+; => ((([\5 161] "Now that the party is jumping\n"))
+;  (([\Q 119] "W¹¨[`IiMED,EeTSAgoaT@ñ[l°Ui"))
+;  (([\~ 117] " )OMBCr9t9+iM/nOHTEqM4AOHn<N"))
+;  (([\L 115] "edA®tDPebL«Sw}RS\rEtqt.jNt"))
+;  (([\Z 114] "tHuvGUEMTViEV\\sLJn\\Y#EieTV")))
+;----------- end ------------
